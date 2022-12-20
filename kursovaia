@@ -15,12 +15,12 @@ struct nname
 };
 
 void proc1(struct nname n[20],float table[h][w],float time[20]);
-void proc2(struct nname n[20], float table[h][w], float time[20]);
-void proc3(struct nname n[20], float table[h][w], float time[20]);
+void proc2(struct nname n[20], float table[h][w],int etap, int d);
+void proc3(struct nname n[20], float table[h][w], float time[20], char namesearch[20]);
 void proc4(struct nname n[20], float table[h][w], float time[20]);
-void proc5(struct nname n[20], float table[h][w], float time[20]);
+void proc5(struct nname n[20], float table[h][w], float time[20], int etap);
 void proc6(struct nname n[20], float table[h][w], float time[20]);
-float proc7(struct nname n[20], float* table[h][w], float time[20]);
+float proc7(struct nname n[20], float* table[h][w], float time[20], int ww, int hh, float b);
 
 int main()
 {
@@ -28,10 +28,9 @@ int main()
 	system("chcp 1251");
 	system("cls");
 	FILE* file = fopen("tablica.txt", "r");
-	int heught = 20; int weight = 4;
-	float table[h][w], time[20];
-	int count=0, k = 0, c = 1;
-	char name[20];
+	int heught = 20; int weight = 4,etap, d, count = 0, k = 0, c = 1, ww, hh;
+	float table[h][w], time[20], b;
+	char name[20], namesearch[20];
 	while (!feof(file))
 	{
 		if (fgetc(file) == '\n')
@@ -53,7 +52,7 @@ int main()
 	while (c > 0)
 	{
 		system("cls");
-		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для вывода таблицы с результатами\nвведите 4 для поиска лучшего или худшего вермени на этапе\nвведите 5 для сортировки по этапу\nвведите 6 для вывода общего, среднего, минимального и максимального общего времени\nвведите 7 для вывода результатов участника\nвведите 0 для выхода из программы\n");
+		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для вывода таблицы с результатами\nвведите 3 для изменения значения\nвведите 4 для поиска лучшего или худшего вермени на этапе\nвведите 5 для сортировки по этапу\nвведите 6 для вывода общего, среднего, минимального и максимального общего времени\nвведите 7 для вывода результатов участника\nвведите 0 для выхода из программы\n");
 		for (int i = 0; i < count; i++)
 		{
 			time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
@@ -68,19 +67,33 @@ int main()
 			proc4(n, table, time);
 			break;
 		case 3:
-			proc7(n, table, time);
+			printf("введите строку\n");
+			scanf("%d", &hh);
+			printf("введите столбец\n");
+			scanf("%d", &ww);
+			printf("введите число с точностью до 0.1\n");
+			scanf("%f", &b);
+			proc7(n, table, time,ww,hh,b);
 			break;
 		case 4:
-			proc2(n, table, time);
+			printf("1-лучший результат 2-худший результат\n");
+			scanf("%d", &d);
+			puts("введите этап");
+			scanf("%d", &etap);
+			proc2(n, table,etap,d);
 			break;
 		case 5:
-			proc5(n, table, time);
+			printf("введите этап\n");
+			scanf("%d", &etap);
+			proc5(n, table, time, etap);
 			break;
 		case 6:
 			proc6(n, table, time);
 			break;
 		case 7:
-			proc3(n, table, time);
+			printf("введите имя\n");
+			scanf("%s", &namesearch);
+			proc3(n, table, time,namesearch);
 			break;
 		case 0:
 			c = 0;
@@ -107,17 +120,12 @@ void proc1(struct nname n[20],float table[h][w],float time[20])
 	system("pause");
 }
 
-void proc2(struct nname n[20], float table[h][w], float time[20])
+void proc2(struct nname n[20], float table[h][w], int etap, int d)
 {
 	system("cls");
-	float best = 0,worst=999999;
-	int etap,d;
-	printf("1-лучший результат 2-худший результат\n");
-	scanf("%d", &d);
+	float best = 0, worst = 999999;
 	if (d == 2)
 	{
-		puts("введите этап");
-		scanf("%d", &etap);
 		etap--;
 		for (int i = 0; i < 20; i++)
 		{
@@ -135,8 +143,6 @@ void proc2(struct nname n[20], float table[h][w], float time[20])
 	}
 	if (d==1)
 	{
-		puts("введите этап");
-		scanf("%d", &etap);
 		etap--;
 		for (int i = 0; i < 20; i++)
 		{
@@ -155,12 +161,9 @@ void proc2(struct nname n[20], float table[h][w], float time[20])
 	system("pause");
 }
 
-void proc3(struct nname n[20], float table[h][w], float time[20])
+void proc3(struct nname n[20], float table[h][w], float time[20],char namesearch[20])
 {
 	system("cls");
-	char namesearch[20];
-	printf("введите имя\n");
-	scanf("%s", &namesearch);
 	for (int i = 0; i < 20; i++)
 	{
 		if (strcmp(namesearch,n[i].name2)==0)
@@ -249,14 +252,12 @@ void proc4(struct nname n[20], float table[h][w], float time[20])
 	system("pause");
 }
 
-void proc5(struct nname n[20], float table[h][w], float time[20])
+void proc5(struct nname n[20], float table[h][w], float time[20],int etap)
 {
 	system("cls");
-	int etap, mesto[20],e=1;
+	int mesto[20],e=1;
 	float table2[h][w], q;
 	memcpy(table2, table, sizeof(table2));
-	printf("введите этап\n");
-	scanf("%d", &etap);
 	etap--;
 	for (int i = 0; i < 20 - 1; i++)
 	{
@@ -353,17 +354,10 @@ void proc6(struct nname n[20], float table[h][w], float time[20])
 	system("pause");
 }
 
-float proc7(struct nname n[20], float table[h][w], float time[20])
+float proc7(struct nname n[20], float table[h][w], float time[20],int ww,int hh,float b)
 {
-	int ww, hh;
-	float b;
-	printf("введите строку\n");
-	scanf("%d", &hh);
+	system("cls");
 	hh--;
-	printf("введите столбец\n");
-	scanf("%d", &ww);
 	ww--;
-	printf("введите число с точностью до 0.1\n");
-	scanf("%f", &b);
 	table[hh][ww] = b;
 }
