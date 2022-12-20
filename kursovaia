@@ -18,8 +18,8 @@ void proc1(struct nname n[20],float table[h][w],float time[20]);
 void proc2(struct nname n[20], float table[h][w],int etap, int d);
 void proc3(struct nname n[20], float table[h][w], float time[20], char namesearch[20]);
 void proc4(struct nname n[20], float table[h][w], float time[20]);
-void proc5(struct nname n[20], float table[h][w], float time[20], int etap);
-void proc6(struct nname n[20], float table[h][w], float time[20]);
+void proc5(struct nname n[20], float table[h][w], int etap);
+void proc6(float time[20]);
 float proc7(struct nname n[20], float* table[h][w], float time[20], int ww, int hh, float b);
 
 int main()
@@ -85,10 +85,10 @@ int main()
 		case 5:
 			printf("введите этап\n");
 			scanf("%d", &etap);
-			proc5(n, table, time, etap);
+			proc5(n, table, etap);
 			break;
 		case 6:
-			proc6(n, table, time);
+			proc6(time);
 			break;
 		case 7:
 			printf("введите имя\n");
@@ -102,7 +102,7 @@ int main()
 	}
 }
 
-void proc1(struct nname n[20],float table[h][w],float time[20])
+void proc1(struct nname n[20],float table[h][w],float time[20])  //печатает исходную таблицу
 {
 	system("cls");
 	printf("________________________________________________________________________________________________\n");
@@ -120,10 +120,10 @@ void proc1(struct nname n[20],float table[h][w],float time[20])
 	system("pause");
 }
 
-void proc2(struct nname n[20], float table[h][w], int etap, int d)
+void proc2(struct nname n[20], float table[h][w], int etap, int d) //поиск лучшего или худшего вермени на этапе
 {
 	system("cls");
-	float best = 0, worst = 999999;
+	float best = 0, worst = 999999999;
 	if (d == 2)
 	{
 		etap--;
@@ -161,7 +161,7 @@ void proc2(struct nname n[20], float table[h][w], int etap, int d)
 	system("pause");
 }
 
-void proc3(struct nname n[20], float table[h][w], float time[20],char namesearch[20])
+void proc3(struct nname n[20], float table[h][w], float time[20],char namesearch[20]) //вывод результатов участника 
 {
 	system("cls");
 	for (int i = 0; i < 20; i++)
@@ -174,7 +174,7 @@ void proc3(struct nname n[20], float table[h][w], float time[20],char namesearch
 	system("pause");
 }
 
-void proc4(struct nname n[20], float table[h][w], float time[20])
+void proc4(struct nname n[20], float table[h][w], float time[20]) //выводит таблицу с результами
 {
 	system("cls");
 	float time2[20],table2[h][w], q;
@@ -252,7 +252,7 @@ void proc4(struct nname n[20], float table[h][w], float time[20])
 	system("pause");
 }
 
-void proc5(struct nname n[20], float table[h][w], float time[20],int etap)
+void proc5(struct nname n[20], float table[h][w],int etap) //сортировка по этапу
 {
 	system("cls");
 	int mesto[20],e=1;
@@ -318,7 +318,7 @@ void proc5(struct nname n[20], float table[h][w], float time[20],int etap)
 	system("pause");
 }
 
-void proc6(struct nname n[20], float table[h][w], float time[20])
+void proc6(float time[20]) //нахождение общего, среднего, минимального и максимального общего времени
 {
 	system("cls");
 	float time2[20], totaltime=0, averagetime=0, totalmax=0, totalmin=999999999;
@@ -354,7 +354,7 @@ void proc6(struct nname n[20], float table[h][w], float time[20])
 	system("pause");
 }
 
-float proc7(struct nname n[20], float table[h][w], float time[20],int ww,int hh,float b)
+float proc7(struct nname n[20], float table[h][w], float time[20],int ww,int hh,float b) //изменение значений 
 {
 	system("cls");
 	hh--;
