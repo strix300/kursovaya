@@ -20,6 +20,7 @@ void proc3(struct nname n[20], float table[h][w], float time[20]);
 void proc4(struct nname n[20], float table[h][w], float time[20]);
 void proc5(struct nname n[20], float table[h][w], float time[20]);
 void proc6(struct nname n[20], float table[h][w], float time[20]);
+float proc7(struct nname n[20], float* table[h][w], float time[20]);
 
 int main()
 {
@@ -48,12 +49,15 @@ int main()
 		fscanf(file, "%f\n", &table[i][k+1]);
 		fscanf(file, "%f\n", &table[i][k+2]);
 		fscanf(file, "%f\n", &table[i][k+3]);
-		time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
 	}
 	while (c > 0)
 	{
 		system("cls");
-		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для поиска лучшего или худшего вермени на этапе\nвведите 3 для вывода результатов участника\nвведите 4 для вывода таблицы с результатами\nвведите 5 для сортировки по этапу\nвведите 6 для вывода общего, среднего, минимального и максимального общего времени\nвведите 0 для выхода из программы\n");
+		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для вывода таблицы с результатами\nвведите 4 для поиска лучшего или худшего вермени на этапе\nвведите 5 для сортировки по этапу\nвведите 6 для вывода общего, среднего, минимального и максимального общего времени\nвведите 7 для вывода результатов участника\nвведите 0 для выхода из программы\n");
+		for (int i = 0; i < count; i++)
+		{
+			time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
+		}
 		scanf("%d", &c);
 		switch (c)
 		{
@@ -61,19 +65,22 @@ int main()
 			proc1(n, table, time);
 			break;
 		case 2:
-			proc2(n, table, time);
+			proc4(n, table, time);
 			break;
 		case 3:
-			proc3(n, table, time);
+			proc7(n, table, time);
 			break;
 		case 4:
-			proc4(n, table, time);
+			proc2(n, table, time);
 			break;
 		case 5:
 			proc5(n, table, time);
 			break;
 		case 6:
 			proc6(n, table, time);
+			break;
+		case 7:
+			proc3(n, table, time);
 			break;
 		case 0:
 			c = 0;
@@ -169,6 +176,10 @@ void proc4(struct nname n[20], float table[h][w], float time[20])
 	system("cls");
 	float time2[20],table2[h][w], q;
 	int mesto[20],e=1,b;
+	for (int i = 0; i < 20; i++)
+	{
+		time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
+	}
 	memcpy(time2, time, sizeof(time2));
 	for (int i = 0; i < 20 - 1; i++)
 	{
@@ -340,4 +351,19 @@ void proc6(struct nname n[20], float table[h][w], float time[20])
 	printf("|общее время\t|среднее время\t|минимальное время|максимальное время|\n");
 	printf("|%5.1fс\t|     %5.1fс \t|\t%5.1fс \t  |\t %5.1fс\t     |\n", totaltime, averagetime, totalmin, totalmax);
 	system("pause");
+}
+
+float proc7(struct nname n[20], float table[h][w], float time[20])
+{
+	int ww, hh;
+	float b;
+	printf("введите строку\n");
+	scanf("%d", &hh);
+	hh--;
+	printf("введите столбец\n");
+	scanf("%d", &ww);
+	ww--;
+	printf("введите число с точностью до 0.1\n");
+	scanf("%f", &b);
+	table[hh][ww] = b;
 }
