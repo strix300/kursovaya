@@ -15,7 +15,7 @@ struct nname
 	char name2[SIZE], bestn[SIZE] ,topn[SIZE], topetap[SIZE];
 };
 
-int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], int count, int k, struct nname n[SIZE], float time[SIZE]);
+int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], struct nname n[SIZE], float time[SIZE]);
 void source_table(struct nname n[SIZE],float table[h][w],float time[SIZE]);
 void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]);
 float replacement(float* table[h][w], int ww, int hh, float b);
@@ -33,14 +33,14 @@ int main()
 	setlocale(LC_ALL, "RUS");
 	system("chcp 1251");
 	system("cls");
-	int heught = 20; int weight = 4,etap, count = 0, k = 0, menu = 1, ww, hh;
+	int heught = 20; int weight = 4,etap, menu = 1, ww, hh;
 	float table[h][w], time[SIZE], b;
 	char name[SIZE], namesearch[SIZE], filename[FILESIZE],rasshirenie[6] = {".txt"};
 	printf("Введите название файла (без указания расширения файла)\n");
 	scanf("%s", filename);
 	strcat(filename, rasshirenie);
 	struct nname n[SIZE];
-	readfile(filename, name, table, count, k, n,time);
+	readfile(filename, name, table, n, time);
 	while (menu > 0)
 	{
 		system("cls");
@@ -102,8 +102,9 @@ int main()
 	}
 }
 
-int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], int count, int k, struct nname n[SIZE],float time[SIZE])
+int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], struct nname n[SIZE],float time[SIZE])
 {
+	int  count = 0, k = 0;
 	printf("%s\n", filename);
 	FILE* file = fopen(filename, "r");
 	while (!feof(file))
