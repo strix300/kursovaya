@@ -6,66 +6,53 @@
 #include <stdio.h>
 #include <string.h>
 #define SIZE 20
-#define h 20
-#define w 4
+#define h 20 //width
+#define w 4  //height
+#define FILESIZE 40
 
 struct nname
 {
-	char name2[20], bestn[20] ,topn[20], topetap[20];
+	char name2[SIZE], bestn[SIZE] ,topn[SIZE], topetap[SIZE];
 };
 
-void proc1(struct nname n[20],float table[h][w],float time[20]);
-void proc2(struct nname n[20], float table[h][w], float time[20]);
-float proc3(struct nname n[20], float* table[h][w], float time[20], int ww, int hh, float b);
-void proc4(struct nname n[20], float table[h][w],int etap);
-void proc5(struct nname n[20], float table[h][w], int etap);
-void proc6(struct nname n[20], float table[h][w], int etap);
-void proc7(float time[20]);
-void proc8(struct nname n[20], float table[h][w], float time[20], char namesearch[20]);
+int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], int count, int k, struct nname n[SIZE], float time[SIZE]);
+void source_table(struct nname n[SIZE],float table[h][w],float time[SIZE]);
+void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]);
+float replacement(float* table[h][w], int ww, int hh, float b);
+void best_stage_time(struct nname n[SIZE], float table[h][w],int etap);
+void worst_stage_time(struct nname n[SIZE], float table[h][w], int etap);
+void sort_stage(struct nname n[SIZE], float table[h][w], int etap);
+void sumtime(float time[SIZE]);
+void averagetime(float time[SIZE]);
+void mintime(float time[SIZE]);
+void maxtime(float time[SIZE]);
+void personstat(struct nname n[SIZE], float table[h][w], float time[SIZE], char namesearch[SIZE]);
 
 int main()
 {
 	setlocale(LC_ALL, "RUS");
 	system("chcp 1251");
 	system("cls");
-	FILE* file = fopen("tablica.txt", "r");
-	int heught = 20; int weight = 4,etap, d, count = 0, k = 0, c = 1, ww, hh;
-	float table[h][w], time[20], b;
-	char name[20], namesearch[20];
-	while (!feof(file))
-	{
-		if (fgetc(file) == '\n')
-			count++;
-	}
-	count++;
-	count = count / 5;
-	struct nname n[20];
-	rewind(file);
-	for (int i = 0; i < count; i++)
-	{
-		fscanf(file, "%s\n", name);  //Чтобы имена спортсменов считывались правильно необходимо сменить кодировку с UTF-8 на ANCII
-		strcpy(n[i].name2, name);
-		fscanf(file, "%f\n", &table[i][k]);
-		fscanf(file, "%f\n", &table[i][k+1]);
-		fscanf(file, "%f\n", &table[i][k+2]);
-		fscanf(file, "%f\n", &table[i][k+3]);
-	}
-	while (c > 0)
+	int heught = 20; int weight = 4,etap, count = 0, k = 0, menu = 1, ww, hh;
+	float table[h][w], time[SIZE], b;
+	char name[SIZE], namesearch[SIZE], filename[FILESIZE],rasshirenie[6] = {".txt"};
+	printf("Введите название файла (без указания расширения файла)\n");
+	scanf("%s", filename);
+	strcat(filename, rasshirenie);
+	struct nname n[SIZE];
+	readfile(filename, name, table, count, k, n,time);
+	while (menu > 0)
 	{
 		system("cls");
-		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для вывода таблицы с результатами\nвведите 3 для изменения значения\nвведите 4 для поиска лучшего времени на этапеп\nвведите 5 для поиска худшего вермени на этапе\nвведите 6 для сортировки по этапу\nвведите 7 для вывода общего, среднего, минимального и максимального общего времени\nвведите 8 для вывода результатов участника\nвведите 0 для выхода из программы\n");
-		for (int i = 0; i < count; i++)
-		{
-			time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
-		}
-		scanf("%d", &c);
-		switch (c)
+		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для вывода таблицы с результатами\nвведите 3 для изменения значения\nвведите 4 для поиска лучшего времени на этапе\nвведите 5 для поиска худшего вермени на этапе\nвведите 6 для сортировки по этапу\nвведите 7 для вывода общего времени\nвведите 8 для вывода среднего времени\nвведите 9 для вывода минимального времени\nвведите 10 для вывода максимального времени\nвведите 11 для вывода результатов участника\nвведите 0 для выхода из программы\n");
+		scanf("%d", &menu);
+		switch (menu)
 		{
 		case 1:
-			proc1(n, table, time);
+			source_table(n, table, time);
 			break;
 		case 2:
-			proc2(n, table, time);
+			result_table(n, table, time);
 			break;
 		case 3:
 			printf("введите строку\n");
@@ -74,39 +61,75 @@ int main()
 			scanf("%d", &ww);
 			printf("введите число с точностью до 0.1\n");
 			scanf("%f", &b);
-			proc3(n, table, time,ww,hh,b);
+			replacement(table,ww,hh,b);
 			break;
 		case 4:
 			puts("введите этап");
 			scanf("%d", &etap);
-			proc4(n, table,etap);
+			best_stage_time(n, table,etap);
 			break;
 		case 5:
 			printf("введите этап\n");
 			scanf("%d", &etap);
-			proc5(n, table, etap);
+			worst_stage_time(n, table, etap);
 			break;
 		case 6:
 			printf("введите этап\n");
 			scanf("%d", &etap);
-			proc6(n, table, etap);
+			sort_stage(n, table, etap);
 			break;
 		case 7:
-			proc7(time);
+			sumtime(time);
 			break;
 		case 8:
+			averagetime(time);
+			break;
+		case 9:
+			mintime(time);
+			break;
+		case 10:
+			maxtime(time);
+			break;
+		case 11:
 			printf("введите имя\n");
 			scanf("%s", &namesearch);
-			proc8(n, table, time,namesearch);
+			personstat(n, table, time,namesearch);
 			break;
 		case 0:
-			c = 0;
+			menu = 0;
 			break;
 		}
 	}
 }
 
-void proc1(struct nname n[20],float table[h][w],float time[20])  //печатает исходную таблицу
+int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], int count, int k, struct nname n[SIZE],float time[SIZE])
+{
+	printf("%s\n", filename);
+	FILE* file = fopen(filename, "r");
+	while (!feof(file))
+	{
+		if (fgetc(file) == '\n')
+			count++;
+	}
+	count++;
+	count = count / 5;
+	rewind(file);
+	for (int i = 0; i < count; i++)
+	{
+		fscanf(file, "%s\n", name);  //Чтобы имена спортсменов считывались правильно необходимо сменить кодировку с UTF-8 на ANCII
+		strcpy(n[i].name2, name);
+		fscanf(file, "%f\n", &table[i][k]);
+		fscanf(file, "%f\n", &table[i][k + 1]);
+		fscanf(file, "%f\n", &table[i][k + 2]);
+		fscanf(file, "%f\n", &table[i][k + 3]);
+	}
+	for (int i = 0; i < count; i++)
+	{
+		time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
+	}
+}
+
+void source_table(struct nname n[SIZE],float table[h][w],float time[SIZE])  //печатает исходную таблицу
 {
 	system("cls");
 	printf("________________________________________________________________________________________________\n");
@@ -124,12 +147,12 @@ void proc1(struct nname n[20],float table[h][w],float time[20])  //печата�
 	system("pause");
 }
 
-void proc2(struct nname n[20], float table[h][w], float time[20]) //выводит таблицу с результами
+void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]) //выводит таблицу с результами
 {
 	system("cls");
-	float time2[20], table2[h][w], q;
-	int mesto[20], e = 1, b;
-	for (int i = 0; i < 20; i++)
+	float time2[SIZE], table2[h][w], q;
+	int mesto[SIZE], e = 1, b;
+	for (int i = 0; i < h; i++)
 	{
 		time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
 	}
@@ -202,7 +225,7 @@ void proc2(struct nname n[20], float table[h][w], float time[20]) //выводи
 	system("pause");
 }
 
-float proc3(struct nname n[20], float table[h][w], float time[20], int ww, int hh, float b) //изменение значений 
+float replacement(float table[h][w], int ww, int hh, float b) //изменение значений 
 {
 	system("cls");
 	hh--;
@@ -210,7 +233,7 @@ float proc3(struct nname n[20], float table[h][w], float time[20], int ww, int h
 	table[hh][ww] = b;
 }
 
-void proc4(struct nname n[20], float table[h][w], int etap) //поиск лучшего или худшего вермени на этапе
+void best_stage_time(struct nname n[SIZE], float table[h][w], int etap) //поиск лучшего или худшего вермени на этапе
 {
 	system("cls");
 	float best = 999999999;
@@ -230,7 +253,7 @@ void proc4(struct nname n[20], float table[h][w], int etap) //поиск луч�
 	printf("|лучший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, best);
 	system("pause");
 }
-void proc5(struct nname n[20], float table[h][w], int etap)
+void worst_stage_time(struct nname n[SIZE], float table[h][w], int etap)
 {
 	system("cls");
 	float worst = 0;
@@ -250,10 +273,10 @@ void proc5(struct nname n[20], float table[h][w], int etap)
 		printf("|худший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, worst);
 		system("pause");
 	}
-void proc6(struct nname n[20], float table[h][w],int etap) //сортировка по этапу
+void sort_stage(struct nname n[SIZE], float table[h][w],int etap) //сортировка по этапу
 {
 	system("cls");
-	int mesto[20],e=1;
+	int mesto[SIZE],e=1;
 	float table2[h][w], q;
 	memcpy(table2, table, sizeof(table2));
 	etap--;
@@ -284,7 +307,7 @@ void proc6(struct nname n[20], float table[h][w],int etap) //сортировк�
 	{
 		for (int k = 0; k < h; k++)
 		{
-			if (abs(table2[i][etap] - table2[k][etap] < 0.1))
+			if (abs(table2[i][etap] - table2[k][etap] < 0.01))
 			{
 				mesto[i] = i + 1;
 				mesto[k] = mesto[i];
@@ -316,15 +339,38 @@ void proc6(struct nname n[20], float table[h][w],int etap) //сортировк�
 	system("pause");
 }
 
-void proc7(float time[20]) //нахождение общего, среднего, минимального и максимального общего времени
+void sumtime(float time[SIZE]) //нахождение общего времени
 {
 	system("cls");
-	float time2[20], totaltime=0, averagetime=0, totalmax=0, totalmin=999999999;
+	float totaltime = 0;
 	for (int i = 0; i < h; i++)
 	{
 		totaltime += time[i];
 	}
-	averagetime = totaltime/h;
+	printf("|\tобщее время\t |\n");
+	printf("|\t%5.1fс\t |\n", totaltime);
+	system("pause");
+}
+
+void averagetime(float time[SIZE]) //нахождение среднего времени
+{
+	system("cls");
+	float totaltime = 0, averagetime = 0;
+	for (int i = 0; i < h; i++)
+	{
+		totaltime += time[i];
+	}
+	averagetime = totaltime / h;
+
+	printf("|среднее время|\n");
+	printf("|    %5.1fс   |\n", averagetime);
+	system("pause");
+}
+
+void mintime(float time[SIZE]) //нахождение минимального времени
+{
+	system("cls");
+	float totalmin = 999999999;
 	for (int i = 0; i < h; i++)
 	{
 		if (totalmin > time[i])
@@ -336,6 +382,15 @@ void proc7(float time[20]) //нахождение общего, среднего
 			totalmin = totalmin;
 		}
 	}
+	printf("|максимальное время|\n");
+	printf("|\t%5.1fс\t   |\n", totalmin);
+	system("pause");
+}
+
+void maxtime(float time[SIZE]) //нахождение максимального времени 
+{
+	system("cls");
+	float totalmax = 0;
 	for (int i = 0; i < h; i++)
 	{
 		if (totalmax < time[i])
@@ -347,13 +402,12 @@ void proc7(float time[20]) //нахождение общего, среднего
 			totalmax = totalmax;
 		}
 	}
-	printf("|общее время\t|среднее время\t|минимальное время|максимальное время|\n");
-	printf("|%5.1fс\t|     %5.1fс \t|\t%5.1fс \t  |\t %5.1fс\t     |\n", totaltime, averagetime, totalmin, totalmax);
+	printf("|максимальное время|\n");
+	printf("|\t%5.1fс\t   |\n", totalmax);
 	system("pause");
 }
 
-
-void proc8(struct nname n[20], float table[h][w], float time[20], char namesearch[20]) //вывод результатов участника 
+void personstat(struct nname n[SIZE], float table[h][w], float time[SIZE], char namesearch[SIZE]) //вывод результатов участника 
 {
 	system("cls");
 	for (int i = 0; i < h; i++)
