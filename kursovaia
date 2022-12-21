@@ -15,12 +15,13 @@ struct nname
 };
 
 void proc1(struct nname n[20],float table[h][w],float time[20]);
-void proc2(struct nname n[20], float table[h][w],int etap, int d);
-void proc3(struct nname n[20], float table[h][w], float time[20], char namesearch[20]);
-void proc4(struct nname n[20], float table[h][w], float time[20]);
+void proc2(struct nname n[20], float table[h][w], float time[20]);
+float proc3(struct nname n[20], float* table[h][w], float time[20], int ww, int hh, float b);
+void proc4(struct nname n[20], float table[h][w],int etap);
 void proc5(struct nname n[20], float table[h][w], int etap);
-void proc6(float time[20]);
-float proc7(struct nname n[20], float* table[h][w], float time[20], int ww, int hh, float b);
+void proc6(struct nname n[20], float table[h][w], int etap);
+void proc7(float time[20]);
+void proc8(struct nname n[20], float table[h][w], float time[20], char namesearch[20]);
 
 int main()
 {
@@ -52,7 +53,7 @@ int main()
 	while (c > 0)
 	{
 		system("cls");
-		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для вывода таблицы с результатами\nвведите 3 для изменения значения\nвведите 4 для поиска лучшего или худшего вермени на этапе\nвведите 5 для сортировки по этапу\nвведите 6 для вывода общего, среднего, минимального и максимального общего времени\nвведите 7 для вывода результатов участника\nвведите 0 для выхода из программы\n");
+		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для вывода таблицы с результатами\nвведите 3 для изменения значения\nвведите 4 для поиска лучшего времени на этапеп\nвведите 5 для поиска худшего вермени на этапе\nвведите 6 для сортировки по этапу\nвведите 7 для вывода общего, среднего, минимального и максимального общего времени\nвведите 8 для вывода результатов участника\nвведите 0 для выхода из программы\n");
 		for (int i = 0; i < count; i++)
 		{
 			time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
@@ -64,7 +65,7 @@ int main()
 			proc1(n, table, time);
 			break;
 		case 2:
-			proc4(n, table, time);
+			proc2(n, table, time);
 			break;
 		case 3:
 			printf("введите строку\n");
@@ -73,14 +74,12 @@ int main()
 			scanf("%d", &ww);
 			printf("введите число с точностью до 0.1\n");
 			scanf("%f", &b);
-			proc7(n, table, time,ww,hh,b);
+			proc3(n, table, time,ww,hh,b);
 			break;
 		case 4:
-			printf("1-лучший результат 2-худший результат\n");
-			scanf("%d", &d);
 			puts("введите этап");
 			scanf("%d", &etap);
-			proc2(n, table,etap,d);
+			proc4(n, table,etap);
 			break;
 		case 5:
 			printf("введите этап\n");
@@ -88,12 +87,17 @@ int main()
 			proc5(n, table, etap);
 			break;
 		case 6:
-			proc6(time);
+			printf("введите этап\n");
+			scanf("%d", &etap);
+			proc6(n, table, etap);
 			break;
 		case 7:
+			proc7(time);
+			break;
+		case 8:
 			printf("введите имя\n");
 			scanf("%s", &namesearch);
-			proc3(n, table, time,namesearch);
+			proc8(n, table, time,namesearch);
 			break;
 		case 0:
 			c = 0;
@@ -107,10 +111,10 @@ void proc1(struct nname n[20],float table[h][w],float time[20])  //печата�
 	system("cls");
 	printf("________________________________________________________________________________________________\n");
 	printf("|Имя\t\t|       1 этап\t |       2 этап\t |       3 этап\t |       4 этап\t |общее время  |\n");
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
 		printf("|%s    \t|", n[i].name2);
-		for (int k = 0; k < 4; k++)
+		for (int k = 0; k < w; k++)
 		{
 			printf("\t%5.1f c  |", table[i][k]);
 		}
@@ -120,73 +124,19 @@ void proc1(struct nname n[20],float table[h][w],float time[20])  //печата�
 	system("pause");
 }
 
-void proc2(struct nname n[20], float table[h][w], int etap, int d) //поиск лучшего или худшего вермени на этапе
+void proc2(struct nname n[20], float table[h][w], float time[20]) //выводит таблицу с результами
 {
 	system("cls");
-	float best = 0, worst = 999999999;
-	if (d == 2)
-	{
-		etap--;
-		for (int i = 0; i < 20; i++)
-		{
-			if (best < table[i][etap])
-			{
-				best = table[i][etap];
-				strcpy(n[0].bestn, n[i].name2);
-			}
-			else
-			{
-				best = best;
-			}
-		}		
-		printf("|худший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, best);
-	}
-	if (d==1)
-	{
-		etap--;
-		for (int i = 0; i < 20; i++)
-		{
-			if (worst > table[i][etap])
-			{
-				worst = table[i][etap];
-				strcpy(n[0].bestn, n[i].name2);
-			}
-			else
-			{
-				worst = worst;
-			}
-		}
-		printf("|лучший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, worst);
-	}
-	system("pause");
-}
-
-void proc3(struct nname n[20], float table[h][w], float time[20],char namesearch[20]) //вывод результатов участника 
-{
-	system("cls");
-	for (int i = 0; i < 20; i++)
-	{
-		if (strcmp(namesearch,n[i].name2)==0)
-		{
-			printf("%s %5.1f %5.1f %5.1f %5.1f %5.1f\n", n[i].name2, table[i][0], table[i][1], table[i][2], table[i][3], time[i]);
-		}
-	}
-	system("pause");
-}
-
-void proc4(struct nname n[20], float table[h][w], float time[20]) //выводит таблицу с результами
-{
-	system("cls");
-	float time2[20],table2[h][w], q;
-	int mesto[20],e=1,b;
+	float time2[20], table2[h][w], q;
+	int mesto[20], e = 1, b;
 	for (int i = 0; i < 20; i++)
 	{
 		time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
 	}
 	memcpy(time2, time, sizeof(time2));
-	for (int i = 0; i < 20 - 1; i++)
+	for (int i = 0; i < h - 1; i++)
 	{
-		for (int j = 0; j < 20 - i - 1; j++)
+		for (int j = 0; j < h - i - 1; j++)
 		{
 			if (time2[j] > time2[j + 1])
 			{
@@ -196,9 +146,9 @@ void proc4(struct nname n[20], float table[h][w], float time[20]) //выводи
 			}
 		}
 	}
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < h; j++)
 		{
 			if (time2[j] == time[i])
 			{
@@ -210,13 +160,13 @@ void proc4(struct nname n[20], float table[h][w], float time[20]) //выводи
 			}
 		}
 	}
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
-		for (int k = 0; k < 20; k++)
+		for (int k = 0; k < h; k++)
 		{
 			if (abs(time2[i] - time2[k] < 0.01))
 			{
-				mesto[i] = i + 1 ;
+				mesto[i] = i + 1;
 				mesto[k] = mesto[i];
 			}
 			else
@@ -225,23 +175,23 @@ void proc4(struct nname n[20], float table[h][w], float time[20]) //выводи
 			}
 		}
 	}
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
-			if (mesto[i] == mesto[i+1])
-			{
-				e++;
-				mesto[i]=mesto[i] - 1;
-				mesto[i+1] = mesto[i];
-				mesto[i + 2] = mesto[i+1] + e;
-				i = i + 3;
-			}
+		if (mesto[i] == mesto[i + 1])
+		{
+			e++;
+			mesto[i] = mesto[i] - 1;
+			mesto[i + 1] = mesto[i];
+			mesto[i + 2] = mesto[i + 1] + e;
+			i = i + 3;
+		}
 	}
 	printf("____________________________________________________________________________________________________________\n");
 	printf("|Имя\t\t|       1 этап\t |       2 этап\t |       3 этап\t |       4 этап\t |общее время  |  место\t   |\n");
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
 		printf("|%s    \t|", n[i].topn);
-		for (int k = 0; k < 4; k++)
+		for (int k = 0; k < w; k++)
 		{
 			printf("\t%5.1f c  |", table2[i][k]);
 		}
@@ -252,16 +202,64 @@ void proc4(struct nname n[20], float table[h][w], float time[20]) //выводи
 	system("pause");
 }
 
-void proc5(struct nname n[20], float table[h][w],int etap) //сортировка по этапу
+float proc3(struct nname n[20], float table[h][w], float time[20], int ww, int hh, float b) //изменение значений 
+{
+	system("cls");
+	hh--;
+	ww--;
+	table[hh][ww] = b;
+}
+
+void proc4(struct nname n[20], float table[h][w], int etap) //поиск лучшего или худшего вермени на этапе
+{
+	system("cls");
+	float best = 999999999;
+	etap--;
+	for (int i = 0; i < h; i++)
+	{
+		if (best > table[i][etap])
+		{
+			best = table[i][etap];
+			strcpy(n[0].bestn, n[i].name2);
+		}
+		else
+		{
+			best = best;
+		}
+	}
+	printf("|лучший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, best);
+	system("pause");
+}
+void proc5(struct nname n[20], float table[h][w], int etap)
+{
+	system("cls");
+	float worst = 0;
+	etap--;
+	for (int i = 0; i < h; i++)
+		{
+			if (worst < table[i][etap])
+			{
+				worst = table[i][etap];
+				strcpy(n[0].bestn, n[i].name2);
+			}
+			else
+			{
+				worst = worst;
+			}
+		}
+		printf("|худший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, worst);
+		system("pause");
+	}
+void proc6(struct nname n[20], float table[h][w],int etap) //сортировка по этапу
 {
 	system("cls");
 	int mesto[20],e=1;
 	float table2[h][w], q;
 	memcpy(table2, table, sizeof(table2));
 	etap--;
-	for (int i = 0; i < 20 - 1; i++)
+	for (int i = 0; i < h - 1; i++)
 	{
-		for (int j = 0; j < 20 - i - 1; j++)
+		for (int j = 0; j < h - i - 1; j++)
 		{
 			if (table2[j][etap] > table2[j + 1][etap])
 			{
@@ -271,9 +269,9 @@ void proc5(struct nname n[20], float table[h][w],int etap) //сортировк�
 			}
 		}
 	}
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < h; j++)
 		{
 			if (table2[j][etap] == table[i][etap])
 			{
@@ -282,9 +280,9 @@ void proc5(struct nname n[20], float table[h][w],int etap) //сортировк�
 		}
 	}
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
-		for (int k = 0; k < 20; k++)
+		for (int k = 0; k < h; k++)
 		{
 			if (abs(table2[i][etap] - table2[k][etap] < 0.1))
 			{
@@ -297,7 +295,7 @@ void proc5(struct nname n[20], float table[h][w],int etap) //сортировк�
 			}
 		}
 	}
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
 		if (mesto[i] == mesto[i + 1])
 		{
@@ -309,7 +307,7 @@ void proc5(struct nname n[20], float table[h][w],int etap) //сортировк�
 		}
 	}
 	printf("|Имя\t\t|       %d этап\t|      место  |\n",etap+1);
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
 		printf("|%s    \t|", n[i].topetap);
 		printf("\t%5.1f c\t|", table2[i][etap]);
@@ -318,16 +316,16 @@ void proc5(struct nname n[20], float table[h][w],int etap) //сортировк�
 	system("pause");
 }
 
-void proc6(float time[20]) //нахождение общего, среднего, минимального и максимального общего времени
+void proc7(float time[20]) //нахождение общего, среднего, минимального и максимального общего времени
 {
 	system("cls");
 	float time2[20], totaltime=0, averagetime=0, totalmax=0, totalmin=999999999;
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
 		totaltime += time[i];
 	}
-	averagetime = totaltime/20;
-	for (int i = 0; i < 20; i++)
+	averagetime = totaltime/h;
+	for (int i = 0; i < h; i++)
 	{
 		if (totalmin > time[i])
 		{
@@ -338,7 +336,7 @@ void proc6(float time[20]) //нахождение общего, среднего
 			totalmin = totalmin;
 		}
 	}
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < h; i++)
 	{
 		if (totalmax < time[i])
 		{
@@ -354,10 +352,16 @@ void proc6(float time[20]) //нахождение общего, среднего
 	system("pause");
 }
 
-float proc7(struct nname n[20], float table[h][w], float time[20],int ww,int hh,float b) //изменение значений 
+
+void proc8(struct nname n[20], float table[h][w], float time[20], char namesearch[20]) //вывод результатов участника 
 {
 	system("cls");
-	hh--;
-	ww--;
-	table[hh][ww] = b;
+	for (int i = 0; i < h; i++)
+	{
+		if (strcmp(namesearch, n[i].name2) == 0)
+		{
+			printf("%s %5.1f %5.1f %5.1f %5.1f %5.1f\n", n[i].name2, table[i][0], table[i][1], table[i][2], table[i][3], time[i]);
+		}
+	}
+	system("pause");
 }
