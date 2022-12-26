@@ -15,7 +15,7 @@ struct nname
 	char name2[SIZE], bestn[SIZE] ,topn[SIZE], topetap[SIZE];
 };
 
-int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], struct nname n[SIZE], float time[SIZE]);
+int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE], float time[SIZE]);
 void source_table(struct nname n[SIZE],float table[h][w],float time[SIZE]);
 void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]);
 float replacement(float* table[h][w], int ww, int hh, float b);
@@ -35,12 +35,12 @@ int main()
 	system("cls");
 	int heught = 20; int weight = 4,etap, menu = 1, ww, hh;
 	float table[h][w], time[SIZE], b;
-	char name[SIZE], namesearch[SIZE], filename[FILESIZE],rasshirenie[6] = {".txt"};
+	char namesearch[SIZE], filename[FILESIZE],rasshirenie[6] = {".txt"};
 	printf("Введите название файла (без указания расширения файла)\n");
 	scanf("%s", filename);
 	strcat(filename, rasshirenie);
 	struct nname n[SIZE];
-	readfile(filename, name, table, n, time);
+	readfile(filename, table, n, time);
 	while (menu > 0)
 	{
 		system("cls");
@@ -102,7 +102,7 @@ int main()
 	}
 }
 
-int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], struct nname n[SIZE],float time[SIZE])
+int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE],float time[SIZE])
 {
 	int  count = 0, k = 0;
 	printf("%s\n", filename);
@@ -117,8 +117,7 @@ int readfile(char filename[FILESIZE], char name[SIZE], float table[h][w], struct
 	rewind(file);
 	for (int i = 0; i < count; i++)
 	{
-		fscanf(file, "%s\n", name);  //Чтобы имена спортсменов считывались правильно необходимо сменить кодировку с UTF-8 на ANCII
-		strcpy(n[i].name2, name);
+		fscanf(file, "%s\n", n[i].name2);  //Чтобы имена спортсменов считывались правильно необходимо сменить кодировку с UTF-8 на ANCII
 		fscanf(file, "%f\n", &table[i][k]);
 		fscanf(file, "%f\n", &table[i][k + 1]);
 		fscanf(file, "%f\n", &table[i][k + 2]);
