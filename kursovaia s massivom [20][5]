@@ -98,6 +98,10 @@ int main()
 		case 0:
 			menu = 0;
 			break;
+		default:
+			system("cls");
+			printf("такого пункта меню нет\n");
+			system("pause");
 		}
 	}
 }
