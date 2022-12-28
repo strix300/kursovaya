@@ -18,7 +18,7 @@ struct nname
 int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE]);
 void source_table(struct nname n[SIZE],float table[h][w]);
 void result_table(struct nname n[SIZE], float table[h][w]);
-float replacement(float* table[h][w], int ww, int hh, float b);
+float replacement(float table[h][w], int ww, int hh, float b);
 void best_stage_time(struct nname n[SIZE], float table[h][w],int etap);
 void worst_stage_time(struct nname n[SIZE], float table[h][w], int etap);
 void sort_stage(struct nname n[SIZE], float table[h][w], int etap);
@@ -108,7 +108,7 @@ int main()
 
 int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE])
 {
-	int  count = 0, k = 0;
+	int  count = 1, k = 0;
 	printf("%s\n", filename);
 	FILE* file = fopen(filename, "r");
 	while (!feof(file))
@@ -116,7 +116,6 @@ int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE])
 		if (fgetc(file) == '\n')
 			count++;
 	}
-	count++;
 	count = count / 5;
 	rewind(file);
 	for (int i = 0; i < count; i++)
@@ -133,8 +132,8 @@ int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE])
 void source_table(struct nname n[SIZE],float table[h][w])  //печатает исходную таблицу
 {
 	system("cls");
-	printf("________________________________________________________________________________________________\n");
-	printf("|Имя\t\t|       1 этап\t |       2 этап\t |       3 этап\t |       4 этап\t |общее время  |\n");
+	printf("__________________________________________________________________________________________________\n");
+	printf("|Имя\t\t|       1 этап\t |       2 этап\t |       3 этап\t |       4 этап\t |общее время    |\n");
 	for (int i = 0; i < h; i++)
 	{
 		printf("|%s    \t|", n[i].name2);
@@ -144,7 +143,7 @@ void source_table(struct nname n[SIZE],float table[h][w])  //печатает и
 		}
 			printf("\n");
 	}
-	printf("|______________________________________________________________________________________________|\n");
+	printf("|________________________________________________________________________________________________|\n");
 	system("pause");
 }
 
@@ -233,7 +232,7 @@ float replacement(float table[h][w], int ww, int hh, float b) //изменени
 	table[hh][ww] = b;
 }
 
-void best_stage_time(struct nname n[SIZE], float table[h][w], int etap) //поиск лучшего или худшего вермени на этапе
+void best_stage_time(struct nname n[SIZE], float table[h][w], int etap) //поиск лучшего времени на этапе
 {
 	system("cls");
 	float best = 999999999;
@@ -253,7 +252,7 @@ void best_stage_time(struct nname n[SIZE], float table[h][w], int etap) //пои
 	printf("|лучший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, best);
 	system("pause");
 }
-void worst_stage_time(struct nname n[SIZE], float table[h][w], int etap)
+void worst_stage_time(struct nname n[SIZE], float table[h][w], int etap) //поиск худшего времени на этапе
 {
 	system("cls");
 	float worst = 0;
@@ -361,7 +360,6 @@ void averagetime(float table[h][w]) //нахождение среднего вр
 		totaltime += table[i][4];
 	}
 	averagetime = totaltime / h;
-
 	printf("|среднее время|\n");
 	printf("|    %5.1fс   |\n", averagetime);
 	system("pause");
@@ -382,7 +380,7 @@ void mintime(float table[h][w]) //нахождение минимального 
 			totalmin = totalmin;
 		}
 	}
-	printf("|максимальное время|\n");
+	printf("|минимальное время |\n");
 	printf("|\t%5.1fс\t   |\n", totalmin);
 	system("pause");
 }
