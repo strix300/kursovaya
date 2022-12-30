@@ -7,7 +7,7 @@
 #include <string.h>
 #define SIZE 20
 #define h 20 //width
-#define w 4  //height
+#define w 5  //height
 #define FILESIZE 40
 
 struct nname
@@ -15,44 +15,44 @@ struct nname
 	char name2[SIZE], bestn[SIZE] ,topn[SIZE], topetap[SIZE];
 };
 
-int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE], float time[SIZE]);
-void source_table(struct nname n[SIZE],float table[h][w],float time[SIZE]);
-void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]);
-float replacement(float* table[h][w], int ww, int hh, float b);
-void best_stage_time(struct nname n[SIZE], float table[h][w],int etap);
-void worst_stage_time(struct nname n[SIZE], float table[h][w], int etap);
-void sort_stage(struct nname n[SIZE], float table[h][w], int etap);
-void sumtime(float time[SIZE]);
-void averagetime(float time[SIZE]);
-void mintime(float time[SIZE]);
-void maxtime(float time[SIZE]);
-void personstat(struct nname n[SIZE], float table[h][w], float time[SIZE], char namesearch[SIZE]);
+int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE]);
+void output_table(float table[h][w], struct nname n[SIZE], int mesto[SIZE]);
+void sorting(float table[h][w], struct nname n[SIZE],int mesto[SIZE]);
+float replacement(float table[h][w], int ww, int hh, float b);
+void best_stage_time(float table[h][w],struct nname n[SIZE],int etap);
+void worst_stage_time(float table[h][w],struct nname n[SIZE], int etap);
+void sort_stage(float table[h][w],struct nname n[SIZE], int etap);
+void sumtime(float table[h][w]);
+void averagetime(float table[h][w]);
+void mintime(float table[h][w]);
+void maxtime(float table[h][w]);
+void personstat(float table[h][w], struct nname n[SIZE], char namesearch[SIZE]);
 
 int main()
 {
 	setlocale(LC_ALL, "RUS");
 	system("chcp 1251");
 	system("cls");
-	int heught = 20; int weight = 4,etap, menu = 1, ww, hh;
-	float table[h][w], time[SIZE], b;
+	int heught = 20; int weight = 4,etap, menu = 1, ww, hh, mesto[SIZE];
+	float table[h][w], b;
 	char namesearch[SIZE], filename[FILESIZE],rasshirenie[6] = {".txt"};
 	printf("Введите название файла (без указания расширения файла)\n");
 	scanf("%s", filename);
 	strcat(filename, rasshirenie);
 	struct nname n[SIZE];
-	readfile(filename, table, n, time);
+	readfile(filename, table, n);
 	while (menu > 0)
 	{
 		system("cls");
-		printf("введите 1 для того чтобы напечатать исходную таблицу\nвведите 2 для вывода таблицы с результатами\nвведите 3 для изменения значения\nвведите 4 для поиска лучшего времени на этапе\nвведите 5 для поиска худшего вермени на этапе\nвведите 6 для сортировки по этапу\nвведите 7 для вывода общего времени\nвведите 8 для вывода среднего времени\nвведите 9 для вывода минимального времени\nвведите 10 для вывода максимального времени\nвведите 11 для вывода результатов участника\nвведите 0 для выхода из программы\n");
+		printf("Меню\n1 - напечатать таблицу\n2 - сортировать\n3 - изменить значение\n4 - поиск лучшего времени на этапе\n5 - поиск худшего времени на этапе\n6 - сортировка по этапу\n7 - вывод общего времени\n8 - вывод среднего времени\n9 - вывод минимального времени\n10 - вывод максимального времени\n11 - вывод результатов участника\n0 - выход из программы\n");
 		scanf("%d", &menu);
 		switch (menu)
 		{
 		case 1:
-			source_table(n, table, time);
+			output_table(table, n, mesto);
 			break;
 		case 2:
-			result_table(n, table, time);
+			sorting(table, n, mesto);
 			break;
 		case 3:
 			printf("введите строку\n");
@@ -66,106 +66,116 @@ int main()
 		case 4:
 			puts("введите этап");
 			scanf("%d", &etap);
-			best_stage_time(n, table,etap);
+			best_stage_time(table, n, etap);
 			break;
 		case 5:
 			printf("введите этап\n");
 			scanf("%d", &etap);
-			worst_stage_time(n, table, etap);
+			worst_stage_time(table, n, etap);
 			break;
 		case 6:
 			printf("введите этап\n");
 			scanf("%d", &etap);
-			sort_stage(n, table, etap);
+			sort_stage(table, n, etap);
 			break;
 		case 7:
-			sumtime(time);
+			sumtime(table);
 			break;
 		case 8:
-			averagetime(time);
+			averagetime(table);
 			break;
 		case 9:
-			mintime(time);
+			mintime(table);
 			break;
 		case 10:
-			maxtime(time);
+			maxtime(table);
 			break;
 		case 11:
 			printf("введите имя\n");
 			scanf("%s", &namesearch);
-			personstat(n, table, time,namesearch);
+			personstat(table, n, namesearch);
 			break;
 		case 0:
 			menu = 0;
 			break;
+		default:
+			system("cls");
+			printf("такого пункта меню нет\n");
+			system("pause");
 		}
 	}
 }
 
-int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE],float time[SIZE])
+int readfile(char filename[FILESIZE], float table[h][w], struct nname n[SIZE]) //считывает данные с файла, передаю (имя файла, двумерный массив с таблицей, структуру где хранятся имена участников)
 {
-	int  count = 0, k = 0;
-	printf("%s\n", filename);
+	int count = 1;
 	FILE* file = fopen(filename, "r");
+	rewind(file);
 	while (!feof(file))
 	{
 		if (fgetc(file) == '\n')
 			count++;
 	}
-	count++;
 	count = count / 5;
 	rewind(file);
 	for (int i = 0; i < count; i++)
 	{
 		fscanf(file, "%s\n", n[i].name2);  //Чтобы имена спортсменов считывались правильно необходимо сменить кодировку с UTF-8 на ANCII
+		table[i][w-1] = 0;
+		for (int k = 0; k < w-1;k++)
+		{
 		fscanf(file, "%f\n", &table[i][k]);
-		fscanf(file, "%f\n", &table[i][k + 1]);
-		fscanf(file, "%f\n", &table[i][k + 2]);
-		fscanf(file, "%f\n", &table[i][k + 3]);
-	}
-	for (int i = 0; i < count; i++)
-	{
-		time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
+		table[i][w-1] += table[i][k];
+		}
 	}
 }
 
-void source_table(struct nname n[SIZE],float table[h][w],float time[SIZE])  //печатает исходную таблицу
+void output_table(float table[h][w], struct nname n[SIZE],int mesto[SIZE]) //выводит таблицу,передаю (двумерный массив с таблицей,структуру с именами участников,массив с местами участников) 
 {
 	system("cls");
-	printf("________________________________________________________________________________________________\n");
-	printf("|Имя\t\t|       1 этап\t |       2 этап\t |       3 этап\t |       4 этап\t |общее время  |\n");
+	printf("____________________________________________________________________________________________________________\n");
+	printf("|Имя\t\t|       1 этап\t |       2 этап\t |       3 этап\t |       4 этап\t |общее время  |  место\t   |\n");
 	for (int i = 0; i < h; i++)
 	{
 		printf("|%s    \t|", n[i].name2);
-		for (int k = 0; k < w; k++)
+		for (int k = 0; k < w - 1; k++)
 		{
 			printf("\t%5.1f c  |", table[i][k]);
 		}
-			printf("\t%5.1f c|\n", time[i]);
+		printf("\t%5.1f c|", table[i][4]);
+		if (mesto[i] > 0)
+		{
+			printf("\t%2d |\n", mesto[i]);
+		}
+		else
+		{
+			printf("\t - |\n");
+		}
 	}
-	printf("|______________________________________________________________________________________________|\n");
+	printf("|__________________________________________________________________________________________________________|\n");
 	system("pause");
 }
 
-void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]) //выводит таблицу с результами
+void sorting(float table[h][w], struct nname n[SIZE], int mesto[SIZE]) //сортирует таблицу, передаю (двумерный массив с таблицей,структуру с именами участников,массив с местами участников)  
 {
 	system("cls");
-	float time2[SIZE], table2[h][w], q;
-	int mesto[SIZE], e = 1, b;
+	float table2[h][w], q, time2[h];
+	int e = 1, b;
+	memcpy(table2, table, sizeof(table2));
 	for (int i = 0; i < h; i++)
 	{
-		time[i] = table[i][0] + table[i][1] + table[i][2] + table[i][3];
+		strcpy(n[i].topn, n[i].name2);
+		time2[i] = table[i][4];
 	}
-	memcpy(time2, time, sizeof(time2));
 	for (int i = 0; i < h - 1; i++)
 	{
 		for (int j = 0; j < h - i - 1; j++)
 		{
-			if (time2[j] > time2[j + 1])
+			if (table[j][4] > table[j + 1][4])
 			{
-				q = time2[j];
-				time2[j] = time2[j + 1];
-				time2[j + 1] = q;
+				q = table[j][4];
+				table[j][4] = table[j + 1][4];
+				table[j + 1][4] = q;
 			}
 		}
 	}
@@ -173,13 +183,13 @@ void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]) //�
 	{
 		for (int j = 0; j < h; j++)
 		{
-			if (time2[j] == time[i])
+			if (table[i][4] == time2[j])
 			{
-				strcpy(n[j].topn, n[i].name2);
-				table2[j][0] = table[i][0];
-				table2[j][1] = table[i][1];
-				table2[j][2] = table[i][2];
-				table2[j][3] = table[i][3];
+				strcpy(n[i].name2, n[j].topn);
+				table[j][0] = table2[i][0];
+				table[j][1] = table2[i][1];
+				table[j][2] = table2[i][2];
+				table[j][3] = table2[i][3];
 			}
 		}
 	}
@@ -187,7 +197,7 @@ void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]) //�
 	{
 		for (int k = 0; k < h; k++)
 		{
-			if (abs(time2[i] - time2[k] < 0.01))
+			if (abs(table[i][4] - table[k][4] < 0.01))
 			{
 				mesto[i] = i + 1;
 				mesto[k] = mesto[i];
@@ -209,23 +219,9 @@ void result_table(struct nname n[SIZE], float table[h][w], float time[SIZE]) //�
 			i = i + 3;
 		}
 	}
-	printf("____________________________________________________________________________________________________________\n");
-	printf("|Имя\t\t|       1 этап\t |       2 этап\t |       3 этап\t |       4 этап\t |общее время  |  место\t   |\n");
-	for (int i = 0; i < h; i++)
-	{
-		printf("|%s    \t|", n[i].topn);
-		for (int k = 0; k < w; k++)
-		{
-			printf("\t%5.1f c  |", table2[i][k]);
-		}
-		printf("\t%5.1f c|", time2[i]);
-		printf("\t%2d |\n", mesto[i]);
-	}
-	printf("|__________________________________________________________________________________________________________|\n");
-	system("pause");
 }
 
-float replacement(float table[h][w], int ww, int hh, float b) //изменение значений 
+float replacement(float table[h][w], int ww, int hh, float b) //изменение значений, передаю (двумерный массив с таблицей, ширину для замены, высоту, на что меняю) 
 {
 	system("cls");
 	hh--;
@@ -233,7 +229,7 @@ float replacement(float table[h][w], int ww, int hh, float b) //изменени
 	table[hh][ww] = b;
 }
 
-void best_stage_time(struct nname n[SIZE], float table[h][w], int etap) //поиск лучшего или худшего вермени на этапе
+void best_stage_time(float table[h][w], struct nname n[SIZE], int etap) //поиск лучшего времени на этапе, передаю(двумерный массив с таблицей, структуру с именами, этап)
 {
 	system("cls");
 	float best = 999999999;
@@ -253,13 +249,14 @@ void best_stage_time(struct nname n[SIZE], float table[h][w], int etap) //пои
 	printf("|лучший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, best);
 	system("pause");
 }
-void worst_stage_time(struct nname n[SIZE], float table[h][w], int etap)
+
+void worst_stage_time(float table[h][w],struct nname n[SIZE], int etap) //поиск худшего времени на этапе, передаю(двумерный массив с таблицей, структуру с именами, этап)
 {
 	system("cls");
 	float worst = 0;
 	etap--;
 	for (int i = 0; i < h; i++)
-		{
+	{
 			if (worst < table[i][etap])
 			{
 				worst = table[i][etap];
@@ -269,11 +266,12 @@ void worst_stage_time(struct nname n[SIZE], float table[h][w], int etap)
 			{
 				worst = worst;
 			}
-		}
-		printf("|худший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, worst);
-		system("pause");
 	}
-void sort_stage(struct nname n[SIZE], float table[h][w],int etap) //сортировка по этапу
+	printf("|худший результат на %d этапе| %s | %5.1f с|\n", etap + 1, n[0].bestn, worst);
+	system("pause");
+}
+
+void sort_stage(float table[h][w],struct nname n[SIZE],int etap) //сортировка по этапу, передаю(двумерный массив с таблицей, структуру с именами, этап)
 {
 	system("cls");
 	int mesto[SIZE],e=1;
@@ -339,63 +337,62 @@ void sort_stage(struct nname n[SIZE], float table[h][w],int etap) //сортир
 	system("pause");
 }
 
-void sumtime(float time[SIZE]) //нахождение общего времени
+void sumtime(float table[h][w]) //нахождение общего времени, передаю(двумерный массив с таблицей)
 {
 	system("cls");
 	float totaltime = 0;
 	for (int i = 0; i < h; i++)
 	{
-		totaltime += time[i];
+		totaltime += table[i][4];
 	}
 	printf("|\tобщее время\t |\n");
 	printf("|\t%5.1fс\t |\n", totaltime);
 	system("pause");
 }
 
-void averagetime(float time[SIZE]) //нахождение среднего времени
+void averagetime(float table[h][w]) //нахождение среднего времени, передаю(двумерный массив с таблицей)
 {
 	system("cls");
 	float totaltime = 0, averagetime = 0;
 	for (int i = 0; i < h; i++)
 	{
-		totaltime += time[i];
+		totaltime += table[i][4];
 	}
 	averagetime = totaltime / h;
-
 	printf("|среднее время|\n");
 	printf("|    %5.1fс   |\n", averagetime);
 	system("pause");
 }
 
-void mintime(float time[SIZE]) //нахождение минимального времени
+void mintime(float table[h][w]) //нахождение минимального времени, передаю(двумерный массив с таблицей)
 {
 	system("cls");
 	float totalmin = 999999999;
 	for (int i = 0; i < h; i++)
 	{
-		if (totalmin > time[i])
+		if (totalmin > table[i][4])
 		{
-			totalmin = time[i];
+			totalmin = table[i][4];
 		}
 		else
 		{
 			totalmin = totalmin;
 		}
 	}
-	printf("|максимальное время|\n");
+	printf("|минимальное время |\n");
 	printf("|\t%5.1fс\t   |\n", totalmin);
 	system("pause");
 }
 
-void maxtime(float time[SIZE]) //нахождение максимального времени 
+void maxtime(float table[h][w]) //нахождение максимального времени, передаю(двумерный массив с таблицей)
 {
 	system("cls");
 	float totalmax = 0;
 	for (int i = 0; i < h; i++)
 	{
-		if (totalmax < time[i])
+		if (totalmax < table[i][4])
 		{
-			totalmax = time[i];
+			totalmax = table[i][4];
 		}
 		else
 		{
@@ -407,14 +404,14 @@ void maxtime(float time[SIZE]) //нахождение максимального
 	system("pause");
 }
 
-void personstat(struct nname n[SIZE], float table[h][w], float time[SIZE], char namesearch[SIZE]) //вывод результатов участника 
+void personstat(float table[h][w],struct nname n[SIZE], char namesearch[SIZE]) //вывод результатов участника, передаю(двумерный массив с таблицей, структуру с именами, имя участника которого ищет пользователь) 
 {
 	system("cls");
 	for (int i = 0; i < h; i++)
 	{
 		if (strcmp(namesearch, n[i].name2) == 0)
 		{
-			printf("%s %5.1f %5.1f %5.1f %5.1f %5.1f\n", n[i].name2, table[i][0], table[i][1], table[i][2], table[i][3], time[i]);
+			printf("%s %5.1f %5.1f %5.1f %5.1f %5.1f\n", n[i].name2, table[i][0], table[i][1], table[i][2], table[i][3], table[i][4]);
 		}
 	}
 	system("pause");
